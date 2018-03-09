@@ -59,8 +59,8 @@ public function get_get($id=0){
     }
     $checkCompany=$this->company->checkCompanyByID($id);
    if(!$checkCompany){
-        $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,'message' => "This Company id not register.");
-        $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+        $response["error"][]=array("code"=>REST_Controller::HTTP_BAD_REQUEST,'message' => "This Company id not register.");
+        $this->response($response, REST_Controller::HTTP_BAD_REQUEST,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
         return;
    }
     $this->db->where("company_id", $id);
@@ -96,14 +96,14 @@ public function add_post(){
                         return;
                     }
                   if(!$this->company->checkCompanyByID($get_request_data["company_id"])){
-                        $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,'message' => "Worng company id pass.");
-                        $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+                        $response["error"][]=array("code"=>REST_Controller::HTTP_BAD_REQUEST,'message' => "Worng company id pass.");
+                        $this->response($response, REST_Controller::HTTP_BAD_REQUEST,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
                         return;
                     }
                     $checkStationName=$this->station->checkStationByName($get_request_data["name"],$get_request_data["company_id"]);
                     if($checkStationName){
-                        $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,'message' => "this station name already exist.");
-                        $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+                        $response["error"][]=array("code"=>REST_Controller::HTTP_METHOD_NOT_ALLOWED,'message' => "this station name already exist.");
+                        $this->response($response, REST_Controller::HTTP_METHOD_NOT_ALLOWED,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
                         return;
                     }
                         $data=array(
@@ -114,8 +114,8 @@ public function add_post(){
                             "created_on"=>time(),
                         );
                             if(!$this->db->insert("station",$data)){
-                                $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,"number"=> $this->db->_error_number(),'message' => $this->db->_error_message());
-                                $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+                                $response["error"][]=array("code"=>REST_Controller::HTTP_INTERNAL_SERVER_ERROR,"number"=> $this->db->_error_number(),'message' => $this->db->_error_message());
+                                $this->response($response, REST_Controller::HTTP_INTERNAL_SERVER_ERROR,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
                                 return;
                             }
                             $response["success"][]=array("msg"=>"Station successfully inserted");
@@ -148,20 +148,20 @@ public function edit_put(){
                         return;
                     }
                     if(empty($stationData=$this->station->checkStationByID($get_request_data["station_id"],true))){
-                        $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,'message' => "Worng Station id pass.");
-                        $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+                        $response["error"][]=array("code"=>REST_Controller::HTTP_BAD_REQUEST,'message' => "Worng Station id pass.");
+                        $this->response($response, REST_Controller::HTTP_BAD_REQUEST,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
                         return;
                     }
                     if(!$this->company->checkCompanyByID($get_request_data["company_id"])){
-                        $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,'message' => "Worng company id pass.");
-                        $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+                        $response["error"][]=array("code"=>REST_Controller::HTTP_UNAUTHORIZED,'message' => "Worng company id pass.");
+                        $this->response($response, REST_Controller::HTTP_UNAUTHORIZED,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
                         return;
                     }                    
                     $is_check_name=($stationData->name == $get_request_data["name"])?0:1;   
                     $checkStationName=$this->station->checkStationByName($get_request_data["name"],$get_request_data["company_id"]);
                     if($checkStationName && $is_check_name){
-                        $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,'message' => "this station name already exist.");
-                        $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+                        $response["error"][]=array("code"=>REST_Controller::HTTP_METHOD_NOT_ALLOWED,'message' => "this station name already exist.");
+                        $this->response($response, REST_Controller::HTTP_METHOD_NOT_ALLOWED,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
                         return;
                     }
                          $data=array(
@@ -173,8 +173,8 @@ public function edit_put(){
                         );
                            
                              if(!$this->db->update("station",$data,array("id"=>$get_request_data["station_id"]))){
-                                $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,"number"=> $this->db->_error_number(),'message' => $this->db->_error_message());
-                                $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+                                $response["error"][]=array("code"=>REST_Controller::HTTP_INTERNAL_SERVER_ERROR,"number"=> $this->db->_error_number(),'message' => $this->db->_error_message());
+                                $this->response($response, REST_Controller::HTTP_INTERNAL_SERVER_ERROR,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
                                 return;
                             }
                             $response["success"][]=array("msg"=>"Station data successfully updated");
@@ -194,8 +194,8 @@ public function delete_delete($id=0){
     }
    $checkCompany=$this->station->checkStationByID($id);
    if(!$checkCompany){
-        $response["error"][]=array("code"=>REST_Controller::HTTP_NOT_ACCEPTABLE,'message' => "This Station id not register.");
-        $this->response($response, REST_Controller::HTTP_NOT_ACCEPTABLE,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
+        $response["error"][]=array("code"=>REST_Controller::HTTP_BAD_REQUEST,'message' => "This Station id not register.");
+        $this->response($response, REST_Controller::HTTP_BAD_REQUEST,$saveRequestToserver_arr); // NOT_FOUND (404) being the HTTP response code   
         return;
    }
    $this->db->delete("station",array("id"=>$id));  
